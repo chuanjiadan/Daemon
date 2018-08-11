@@ -31,3 +31,6 @@ int child_create_channel();
 
 void child_listen_msg();
 
+int get_version();
+
+

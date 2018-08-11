@@ -20,7 +20,7 @@ public class ProcessService extends Service {
         super.onCreate();
         ChrisDaemon chrisDaemon = new ChrisDaemon();
         int uId = Process.myUid();
-        Log.d(TAG, "进程好： " + uId);
+        Log.d(TAG, "进程号： " + uId);
         //
         chrisDaemon.creatDaemon(String.valueOf(Process.myPid()));
         chrisDaemon.connectMonitor();
@@ -33,7 +33,7 @@ public class ProcessService extends Service {
                         Log.d(TAG, "服务存活：" + i);
                         i++;
                     }
-                }, 0, 1000 * 3);
+                }, 0, 15000);
     }
 
     @Override
@@ -43,5 +43,10 @@ public class ProcessService extends Service {
         return null;
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand: ---------------------------------------------");
 
+        return super.onStartCommand(intent, flags, startId);
+    }
 }

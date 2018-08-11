@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <string>
 #include <unistd.h>
+#include <sys/system_properties.h>
 #include "native_lib.h"
 
 const char *path = "/data/data/com.chris.daemon/my.sock";//socket文件路径
@@ -35,10 +36,14 @@ Java_com_chris_daemon_ChrisDaemon_creatDaemon(JNIEnv *env, jobject instance, jst
 
     }
     //生成子进程sectionID
-    setsid();
+    pid_t i1 = setsid();
+    LOGE("生成子进程sectionID   %d", i1);
     //当前子进程运行目录改为根目录，防止os卸载
-    chdir("/");
+    int i = chdir("/");
+    LOGE("子进程运行目录改为根目录  %d", i);
+    int i2 = execv(path, NULL);
 
+    LOGE("  逢甲：   %d ", i2);
 
     env->ReleaseStringUTFChars(userId_, userId);
 }
@@ -151,6 +156,8 @@ void child_listen_msg() {
     close(STDERR_FILENO);
 
     //
+    int sdk_version = get_version();
+    LOGE("sdk的版本号：%d" , sdk_version);
 
     //循环去读  read resv 都是读
     while (1) {
@@ -159,7 +166,7 @@ void child_listen_msg() {
 
         //Linux阻塞函数，监视文件的具柄数
         int r = select(m_child + 1, &rfds, NULL, NULL, &timeout);
-        LOGE("读取消息  %d ", r);
+//        LOGE("读取消息  %d ", r);
         if (r > 0) {
             //缓冲区
             char pkg[256] = {0};
@@ -169,19 +176,40 @@ void child_listen_msg() {
                 int result = read(m_child, pkg, sizeof(pkg));
                 LOGE("阻塞函数，实际不读数据 %d ", result);
                 //read不阻塞说明apk进程连接断开，就去启动服务
-                int am = execlp("am",
-                                "am",
-                                "startservice",
-                                "--user", userId,
-                                "com.chris.daemon/com.chris.daemon.ProcessService",
-                                (char *) NULL);
-                LOGE("启动服务：%d", am);
+
+
+                if (sdk_version >= 17 || sdk_version == 0) {
+
+                    int am = execlp("am",
+                                    "am",
+                                    "startservice",
+                                    "--user", userId,
+                                    "com.chris.daemon/com.chris.daemon.ProcessService",
+                                    (char *) NULL);
+                    LOGE("启动服务 >= 17 ：%d", am);
+
+
+                } else {
+                    int am = execlp("am", "am", "startservice", "-n",
+                                    "com.chris.daemon/com.chris.daemon.ProcessService",
+                                    (char *) NULL);
+                    LOGE("启动服务：%d", am);
+                }
+
+
                 break;
             }
         }
 
     }
 
+
+}
+
+int get_version() {
+    char value[8] = "";
+    __system_property_get("ro.build.version.sdk", value);
+    return atoi(value);
 }
 
 
