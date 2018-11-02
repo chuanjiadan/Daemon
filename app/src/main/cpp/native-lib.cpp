@@ -4,7 +4,9 @@
 #include <sys/system_properties.h>
 #include "native_lib.h"
 
-const char *path = "/data/data/com.chris.daemon/my.sock";//socket文件路径
+//const char *path = "/data/data/com.chris.daemon/my.sock";//socket文件路径
+const char *path;//socket文件路径
+const char *serviceName;//被守护的服务
 int m_child;
 const char *userId;
 
@@ -12,9 +14,14 @@ const char *userId;
 extern "C"
 JNIEXPORT
 void JNICALL
-Java_com_chris_daemon_ChrisDaemon_creatDaemon(JNIEnv *env, jobject instance, jstring userId_) {
+Java_com_chris_daemon_ChrisDaemon_creatDaemon(JNIEnv *env, jobject instance, jstring userId_,
+                                              jstring sockeName_, jstring serviceName_) {
     userId = env->GetStringUTFChars(userId_, 0);
+    path = env->GetStringUTFChars(sockeName_, 0);
+    serviceName = env->GetStringUTFChars(serviceName_, 0);
+
     LOGE("Ndk开起调用   %d", userId_);
+    LOGE("Ndk开起调用,socket文件路径:   %d", sockeName_);
 
 
     // linux中开启双进程
@@ -46,6 +53,8 @@ Java_com_chris_daemon_ChrisDaemon_creatDaemon(JNIEnv *env, jobject instance, jst
     LOGE("  逢甲：   %d ", i2);
 
     env->ReleaseStringUTFChars(userId_, userId);
+//    env->ReleaseStringUTFChars(sockeName_, path);
+//    env->ReleaseStringUTFChars(serviceName_, serviceName);
 }
 
 
@@ -157,7 +166,7 @@ void child_listen_msg() {
 
     //
     int sdk_version = get_version();
-    LOGE("sdk的版本号：%d" , sdk_version);
+    LOGE("sdk的版本号：%d", sdk_version);
 
     //循环去读  read resv 都是读
     while (1) {
@@ -178,23 +187,26 @@ void child_listen_msg() {
                 //read不阻塞说明apk进程连接断开，就去启动服务
 
 
+                LOGE("版本号 ：%d", sdk_version);
                 if (sdk_version >= 17 || sdk_version == 0) {
+                    LOGE("启动服务 >= 17 ：%d", sdk_version);
 
                     int am = execlp("am",
                                     "am",
                                     "startservice",
                                     "--user", userId,
-                                    "com.chris.daemon/com.chris.daemon.ProcessService",
+                                    serviceName,
                                     (char *) NULL);
-                    LOGE("启动服务 >= 17 ：%d", am);
 
 
                 } else {
+                    LOGE("启动服务：%d", sdk_version);
                     int am = execlp("am", "am", "startservice", "-n",
-                                    "com.chris.daemon/com.chris.daemon.ProcessService",
+                                    serviceName,
                                     (char *) NULL);
-                    LOGE("启动服务：%d", am);
                 }
+
+                LOGE("不作为是几个意思 %d", sdk_version);
 
 
                 break;

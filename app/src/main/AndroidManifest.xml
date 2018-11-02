@@ -17,7 +17,11 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".ProcessService"></service>
+        <service
+            android:name=".ProcessService"
+            android:process=":mainProcess">
+
+        </service>
     </application>
 
 </manifest>
