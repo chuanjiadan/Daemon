@@ -4,7 +4,7 @@
 #include <sys/system_properties.h>
 #include "native_lib.h"
 
-const char *path = "/data/data/com.chris.daemon/my.sock";//socket文件路径
+const char *path;//socket文件路径
 int m_child;
 const char *userId;
 
@@ -12,7 +12,12 @@ const char *userId;
 extern "C"
 JNIEXPORT
 void JNICALL
-Java_com_chris_daemon_ChrisDaemon_creatDaemon(JNIEnv *env, jobject instance, jstring userId_) {
+Java_com_chris_daemon_ChrisDaemon_creatDaemon(JNIEnv *env, jobject instance,
+                                              jstring packageName_,
+                                              jstring userId_) {
+
+
+    path = env->GetStringUTFChars(packageName_, 0);
     userId = env->GetStringUTFChars(userId_, 0);
     LOGE("Ndk开起调用   %d", userId_);
 
@@ -157,7 +162,7 @@ void child_listen_msg() {
 
     //
     int sdk_version = get_version();
-    LOGE("sdk的版本号：%d" , sdk_version);
+    LOGE("sdk的版本号：%d", sdk_version);
 
     //循环去读  read resv 都是读
     while (1) {
@@ -211,7 +216,3 @@ int get_version() {
     __system_property_get("ro.build.version.sdk", value);
     return atoi(value);
 }
-
-
-
-
