@@ -1,30 +1,47 @@
 package com.chris.daemon;
 
+import android.annotation.SuppressLint;
+import android.app.Application;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.xiyun.logutils.YLog;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class ProcessService extends Service {
     private static final String TAG = "sniper ProcessService ";
+    private static Application application;
+
 
     private int i = 0;
+    @SuppressLint("HandlerLeak")
+    static Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            int what = msg.what;
+            YLog.d(TAG, "服务进程存活" + CUtils.formatTime(System.currentTimeMillis()));
+            Toast.makeText(application, "进程存活" + what, Toast.LENGTH_LONG).show();
+
+
+        }
+    };
 
 
     @Override
     public void onCreate() {
         super.onCreate();
-        ChrisDaemon chrisDaemon = new ChrisDaemon();
-        int uId = Process.myUid();
-        Log.d(TAG, "进程号： " + uId);
+        application = getApplication();
 
-        //
-        chrisDaemon.init(uId,getPackageName(),"com.chris.daemon/com.chris.daemon.ProcessService");
+
+
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(
@@ -32,12 +49,12 @@ public class ProcessService extends Service {
                     @Override
                     public void run() {
                         Log.d(TAG, "服务存活：" + i);
-//                        Toast.makeText(getApplicationContext(),"服务存活",Toast.LENGTH_LONG).show();
-
-
                         i++;
+                        Message message = new Message();
+                        message.what = i;
+                        mHandler.sendMessage(message);
                     }
-                }, 0, 20000);
+                }, 0, 15000);
     }
 
     @Override
@@ -49,9 +66,26 @@ public class ProcessService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand: ---------------------------------------------");
-        Toast.makeText(getApplicationContext(),"服务唤醒",Toast.LENGTH_LONG).show();
+        YLog.e(TAG, " 服务被守护者唤起 " + CUtils.formatTime(System.currentTimeMillis()));
+        Toast.makeText(getApplication(), "服务被守护者拉活", Toast.LENGTH_LONG).show();
+        return Service.START_STICKY;
+    }
 
-        return super.onStartCommand(intent, flags, startId);
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        YLog.d(TAG, "onDestroy:" + CUtils.formatTime(System.currentTimeMillis()));
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        YLog.d(TAG, "低内存");
+    }
+
+    @Override
+    public void onStart(Intent intent, int startId) {
+        super.onStart(intent, startId);
+
     }
 }

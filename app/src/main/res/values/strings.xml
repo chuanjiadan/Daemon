@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Daemon</string>
+    <string name="daemon">辅助一下</string>
 </resources>
