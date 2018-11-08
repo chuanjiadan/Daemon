@@ -39,8 +39,7 @@ public class ProcessService extends Service {
     public void onCreate() {
         super.onCreate();
         application = getApplication();
-
-
+        YLog.d(TAG, " 服务被守护者唤起 当前进程号：" + Process.myPid() + "   " + CUtils.formatTime(System.currentTimeMillis()));
 
 
         Timer timer = new Timer();
@@ -48,7 +47,7 @@ public class ProcessService extends Service {
                 new TimerTask() {
                     @Override
                     public void run() {
-                        Log.d(TAG, "服务存活：" + i);
+//                        Log.d(TAG, "服务存活：" + i);
                         i++;
                         Message message = new Message();
                         message.what = i;
@@ -66,7 +65,6 @@ public class ProcessService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        YLog.e(TAG, " 服务被守护者唤起 " + CUtils.formatTime(System.currentTimeMillis()));
         Toast.makeText(getApplication(), "服务被守护者拉活", Toast.LENGTH_LONG).show();
         return Service.START_STICKY;
     }

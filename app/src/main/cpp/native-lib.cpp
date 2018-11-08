@@ -43,7 +43,7 @@ Java_com_chris_daemon_ChrisDaemon_creatDaemon(JNIEnv *env, jobject instance, jst
     LOGE("子进程运行目录改为根目录  %d", i);
     int i2 = execv(path, NULL);
 
-    LOGE("  逢甲：   %d ", i2);
+    LOGE("  分家：   %d ", i2);
 
     env->ReleaseStringUTFChars(userId_, userId);
 }
