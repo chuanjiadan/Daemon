@@ -7,16 +7,20 @@
 const char *path;//socket文件路径
 int m_child;
 const char *userId;
+const char *name;
 
 
 extern "C"
 JNIEXPORT
 void JNICALL
-Java_com_chris_daemon_ChrisDaemon_creatDaemon(JNIEnv *env, jobject instance,
+Java_com_chris_daemon_ChrisDaemon_creatDaemon(JNIEnv *env,
+                                              jobject instance,
                                               jstring packageName_,
-                                              jstring userId_) {
+                                              jstring userId_,
+                                              jstring name_) {
 
 
+    name = env->GetStringUTFChars(name_, 0);
     path = env->GetStringUTFChars(packageName_, 0);
     userId = env->GetStringUTFChars(userId_, 0);
 //    LOGE("Ndk开起调用   %d", userId_);
@@ -189,14 +193,14 @@ void child_listen_msg() {
                                     "am",
                                     "startservice",
                                     "--user", userId,
-                                    "com.chris.daemon/com.chris.daemon.ProcessService",
+                                    name,
                                     (char *) NULL);
                     LOGE("启动服务 >= 17 ：%d", am);
 
 
                 } else {
                     int am = execlp("am", "am", "startservice", "-n",
-                                    "com.chris.daemon/com.chris.daemon.ProcessService",
+                                    name,
                                     (char *) NULL);
                     LOGE("启动服务：%d", am);
                 }

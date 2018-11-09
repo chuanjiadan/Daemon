@@ -6,6 +6,9 @@ import android.util.Log;
 
 public class MyApplication extends Application {
 
+//    String name="com.chris.daemon/com.chris.daemon.ProcessServic";
+    String name="com.chris.daemon/com.chris.daemon.ProcessServic";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -15,7 +18,7 @@ public class MyApplication extends Application {
         int uId = Process.myUid();
         Log.d("sniper ", "进程号： " + uId);
 
-        chrisDaemon.initDaemon(getPackageName());
+        chrisDaemon.initDaemon(getPackageName(),name);
 
 
     }

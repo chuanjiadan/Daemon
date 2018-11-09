@@ -15,8 +15,9 @@ public class ChrisDaemon {
      *
      * @param packageName
      * @param userId      进程id
+     * @param name
      */
-    public native void creatDaemon(String packageName, String userId);
+    public native void creatDaemon(String packageName, String userId, String name);
 
     /**
      * 客户端调用
@@ -24,8 +25,10 @@ public class ChrisDaemon {
     public native void connectMonitor();
 
 
-    public void initDaemon(String packageName) {
-        creatDaemon("data/data/" + packageName + "/my.socket", String.valueOf(Process.myPid()));
+    public void initDaemon(String packageName, String srvices) {
+        creatDaemon("data/data/" + packageName + "/my.socket",
+                String.valueOf(Process.myPid()),
+                srvices);
         connectMonitor();
 
     }
