@@ -19,7 +19,7 @@ Java_com_chris_daemon_ChrisDaemon_creatDaemon(JNIEnv *env, jobject instance,
 
     path = env->GetStringUTFChars(packageName_, 0);
     userId = env->GetStringUTFChars(userId_, 0);
-    LOGE("Ndk开起调用   %d", userId_);
+//    LOGE("Ndk开起调用   %d", userId_);
 
 
     // linux中开启双进程

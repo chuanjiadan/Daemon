@@ -11,8 +11,6 @@ import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.xiyun.logutils.YLog;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,7 +25,7 @@ public class ProcessService extends Service {
         @Override
         public void handleMessage(Message msg) {
             int what = msg.what;
-            YLog.d(TAG, "服务进程存活" + CUtils.formatTime(System.currentTimeMillis()));
+            Log.d(TAG, "服务进程存活" + CUtils.formatTime(System.currentTimeMillis()));
             Toast.makeText(application, "进程存活" + what, Toast.LENGTH_LONG).show();
 
 
@@ -39,7 +37,7 @@ public class ProcessService extends Service {
     public void onCreate() {
         super.onCreate();
         application = getApplication();
-        YLog.d(TAG, " 服务被守护者唤起 当前进程号：" + Process.myPid() + "   " + CUtils.formatTime(System.currentTimeMillis()));
+        Log.d(TAG, " 服务被守护者唤起 当前进程号：" + Process.myPid() + "   " + CUtils.formatTime(System.currentTimeMillis()));
 
 
         Timer timer = new Timer();
@@ -72,13 +70,13 @@ public class ProcessService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        YLog.d(TAG, "onDestroy:" + CUtils.formatTime(System.currentTimeMillis()));
+        Log.d(TAG, "onDestroy:" + CUtils.formatTime(System.currentTimeMillis()));
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        YLog.d(TAG, "低内存");
+        Log.d(TAG, "低内存");
     }
 
     @Override

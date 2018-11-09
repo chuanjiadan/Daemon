@@ -4,14 +4,11 @@ import android.app.Application;
 import android.os.Process;
 import android.util.Log;
 
-import com.xiyun.logutils.YLog;
-
 public class MyApplication extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
-        YLog.init(getBaseContext(), 3, 3, true, true);
 
 
         ChrisDaemon chrisDaemon = new ChrisDaemon();
